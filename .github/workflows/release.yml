@@ -1,0 +1,96 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-release:
+    name: ${{ matrix.os }} / ${{ matrix.artifact_name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            config: Release
+            binary_path: build/Release/svg_squisher.exe
+            artifact_name: svg-squisher-windows-x64
+            archive_ext: zip
+          - os: ubuntu-latest
+            config: Release
+            binary_path: build/svg_squisher
+            artifact_name: svg-squisher-linux-x64
+            archive_ext: tar.gz
+          - os: macos-latest
+            config: Release
+            binary_path: build/svg_squisher
+            artifact_name: svg-squisher-macos
+            archive_ext: tar.gz
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.config }}
+
+      - name: Build
+        run: cmake --build build --config ${{ matrix.config }}
+
+      - name: Smoke Test
+        shell: bash
+        run: ${{ matrix.binary_path }} --help
+
+      - name: Package Windows Binary
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item "${{ matrix.binary_path }}" "dist/svg_squisher.exe"
+          Compress-Archive -Path "dist/svg_squisher.exe" -DestinationPath "${{ matrix.artifact_name }}.zip"
+
+      - name: Package Linux Binary
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp "${{ matrix.binary_path }}" dist/svg_squisher
+          tar -czf "${{ matrix.artifact_name }}.tar.gz" -C dist svg_squisher
+
+      - name: Package macOS Binary
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp "${{ matrix.binary_path }}" dist/svg_squisher
+          tar -czf "${{ matrix.artifact_name }}.tar.gz" -C dist svg_squisher
+
+      - name: Upload Release Asset
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_name }}.${{ matrix.archive_ext }}
+
+  publish-release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    needs: build-release
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download Release Assets
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release-assets/svg-squisher-windows-x64/svg-squisher-windows-x64.zip
+            release-assets/svg-squisher-linux-x64/svg-squisher-linux-x64.tar.gz
+            release-assets/svg-squisher-macos/svg-squisher-macos.tar.gz
+          generate_release_notes: true

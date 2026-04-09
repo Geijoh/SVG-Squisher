@@ -65,6 +65,22 @@ Provide an explicit font for text conversion:
   - build configuration
 - `.github/workflows/build.yml`
   - CI build workflow
+- `.github/workflows/release.yml`
+  - tag-driven release workflow for packaged binaries
+
+## Releases
+
+Push a version tag to automatically build and publish release binaries on GitHub:
+
+```powershell
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+The release workflow publishes:
+
+- `svg-squisher-windows-x64.zip`
+- `svg-squisher-linux-x64.tar.gz`
 
 ## Status
 
