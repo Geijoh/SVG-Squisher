@@ -57,6 +57,39 @@ Provide an explicit font for text conversion:
 .\build\Release\svg_squisher.exe input.svg output.svg --font C:\Windows\Fonts\arial.ttf
 ```
 
+## Visual Compare
+
+An input-vs-output comparison page is included at `compare.html`.
+
+By default it compares:
+
+- `svgs/`
+- `svgs-out/`
+
+Serve the repo with a static file server, then open the compare page:
+
+```powershell
+python -m http.server 8080
+```
+
+Then browse to:
+
+```text
+http://127.0.0.1:8080/compare.html
+```
+
+You can also override the folders with query parameters:
+
+```text
+http://127.0.0.1:8080/compare.html?input=svgs&output=svgs-out
+```
+
+The preview size is also configurable from the page or via query parameter:
+
+```text
+http://127.0.0.1:8080/compare.html?input=svgs&output=svgs-out&size=180
+```
+
 ## Repository Layout
 
 - `src/`

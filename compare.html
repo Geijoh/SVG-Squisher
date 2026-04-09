@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SVG Squisher Compare</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #1f1f1f;
+      --panel: #2a2a2a;
+      --panel-2: #333;
+      --border: #4a4a4a;
+      --text: #f3f3f3;
+      --muted: #b8b8b8;
+      --accent: #7fb3ff;
+      --preview-size: 180px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(31, 31, 31, 0.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 20px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 240px;
+    }
+
+    .field.size-field {
+      min-width: 120px;
+      max-width: 120px;
+    }
+
+    label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--text);
+    }
+
+    button {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--panel-2);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+    }
+
+    .meta {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    main {
+      padding: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(220px, 320px) minmax(200px, 1fr) minmax(200px, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .cell {
+      min-height: 140px;
+    }
+
+    .name {
+      font-size: 16px;
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      padding: 12px;
+      border-radius: 10px;
+      min-height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .preview-frame {
+      width: var(--preview-size);
+      height: var(--preview-size);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #3a3a3a;
+      border-radius: 6px;
+      overflow: hidden;
+      flex: 0 0 auto;
+    }
+
+    .card img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      object-position: center;
+      background: #3a3a3a;
+    }
+
+    .missing {
+      color: var(--muted);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .header-row {
+      position: sticky;
+      top: 108px;
+      z-index: 5;
+      background: var(--bg);
+      padding-bottom: 4px;
+    }
+
+    .col-head {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .row {
+      display: contents;
+    }
+
+    a {
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>SVG Squisher Compare</h1>
+    <div class="controls">
+      <div class="field">
+        <label for="inputDir">Input Folder</label>
+        <input id="inputDir" value="svgs">
+      </div>
+      <div class="field">
+        <label for="outputDir">Output Folder</label>
+        <input id="outputDir" value="svgs-out">
+      </div>
+      <div class="field size-field">
+        <label for="previewSize">Preview Size</label>
+        <input id="previewSize" type="number" min="64" step="8" value="180">
+      </div>
+      <button id="reloadBtn" type="button">Reload</button>
+    </div>
+    <div class="meta" id="meta">Loading…</div>
+  </header>
+  <main>
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <script>
+    const inputField = document.getElementById("inputDir");
+    const outputField = document.getElementById("outputDir");
+    const previewSizeField = document.getElementById("previewSize");
+    const reloadBtn = document.getElementById("reloadBtn");
+    const meta = document.getElementById("meta");
+    const grid = document.getElementById("grid");
+
+    function normalizeSize(value) {
+      const parsed = Number.parseInt(String(value || "").trim(), 10);
+      if (!Number.isFinite(parsed)) return 180;
+      return Math.max(64, Math.min(512, parsed));
+    }
+
+    function normalizeDir(value) {
+      return (value || "").trim().replace(/\\/g, "/").replace(/\/+$/, "");
+    }
+
+    function withSlash(value) {
+      return value ? value + "/" : "";
+    }
+
+    function readQueryParams() {
+      const url = new URL(window.location.href);
+      const input = normalizeDir(url.searchParams.get("input")) || "svgs";
+      const output = normalizeDir(url.searchParams.get("output")) || "svgs-out";
+      const size = normalizeSize(url.searchParams.get("size"));
+      inputField.value = input;
+      outputField.value = output;
+      previewSizeField.value = size;
+      document.documentElement.style.setProperty("--preview-size", `${size}px`);
+    }
+
+    function updateQueryParams() {
+      const url = new URL(window.location.href);
+      const size = normalizeSize(previewSizeField.value);
+      url.searchParams.set("input", normalizeDir(inputField.value) || "svgs");
+      url.searchParams.set("output", normalizeDir(outputField.value) || "svgs-out");
+      url.searchParams.set("size", String(size));
+      previewSizeField.value = size;
+      document.documentElement.style.setProperty("--preview-size", `${size}px`);
+      history.replaceState({}, "", url);
+    }
+
+    async function listSvgFiles(dir) {
+      const response = await fetch(withSlash(dir), { cache: "no-store" });
+      if (!response.ok) {
+        throw new Error(`Could not read directory listing for "${dir}"`);
+      }
+
+      const html = await response.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const names = new Set();
+
+      for (const link of doc.querySelectorAll("a[href]")) {
+        const href = link.getAttribute("href");
+        if (!href) continue;
+        const clean = href.split("?")[0].split("#")[0];
+        const name = clean.replace(/\/$/, "").split("/").pop();
+        if (name && /\.svg$/i.test(name)) {
+          names.add(name);
+        }
+      }
+
+      return Array.from(names).sort((a, b) => a.localeCompare(b));
+    }
+
+    function renderMissing() {
+      const div = document.createElement("div");
+      div.className = "missing";
+      div.textContent = "Missing";
+      return div;
+    }
+
+    function renderImage(dir, file) {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      if (!file) {
+        card.appendChild(renderMissing());
+        return card;
+      }
+
+      const img = document.createElement("img");
+      img.alt = file;
+      img.loading = "lazy";
+      img.src = `${withSlash(dir)}${encodeURIComponent(file)}?v=${Date.now()}`;
+      const frame = document.createElement("div");
+      frame.className = "preview-frame";
+      frame.appendChild(img);
+      card.appendChild(frame);
+      return card;
+    }
+
+    function renderRows(inputDir, outputDir, inputFiles, outputFiles) {
+      grid.innerHTML = "";
+
+      const headerCells = ["File", "Input", "Output"];
+      for (const text of headerCells) {
+        const div = document.createElement("div");
+        div.className = "cell header-row";
+        const head = document.createElement("div");
+        head.className = "col-head";
+        head.textContent = text;
+        div.appendChild(head);
+        grid.appendChild(div);
+      }
+
+      const allFiles = Array.from(new Set([...inputFiles, ...outputFiles])).sort((a, b) => a.localeCompare(b));
+
+      for (const file of allFiles) {
+        const nameCell = document.createElement("div");
+        nameCell.className = "cell name";
+        nameCell.textContent = file;
+        grid.appendChild(nameCell);
+
+        grid.appendChild(renderImage(inputDir, inputFiles.includes(file) ? file : ""));
+        grid.appendChild(renderImage(outputDir, outputFiles.includes(file) ? file : ""));
+      }
+
+      const size = normalizeSize(previewSizeField.value);
+      meta.innerHTML = `Showing <strong>${allFiles.length}</strong> SVG file(s). Input: <code>${inputDir}</code>. Output: <code>${outputDir}</code>. Preview size: <code>${size}px</code>.`;
+    }
+
+    async function load() {
+      const inputDir = normalizeDir(inputField.value) || "svgs";
+      const outputDir = normalizeDir(outputField.value) || "svgs-out";
+      updateQueryParams();
+      meta.textContent = "Loading…";
+
+      try {
+        const [inputFiles, outputFiles] = await Promise.all([
+          listSvgFiles(inputDir),
+          listSvgFiles(outputDir),
+        ]);
+        renderRows(inputDir, outputDir, inputFiles, outputFiles);
+      } catch (error) {
+        grid.innerHTML = "";
+        meta.innerHTML = `${error.message}. Serve the repo with a static file server so directory listings are available.`;
+      }
+    }
+
+    reloadBtn.addEventListener("click", load);
+    inputField.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") load();
+    });
+    outputField.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") load();
+    });
+    previewSizeField.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") load();
+    });
+
+    readQueryParams();
+    load();
+  </script>
+</body>
+</html>

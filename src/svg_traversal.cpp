@@ -186,19 +186,24 @@ void collect_paths(const pugi::xml_node& node,
       if (emit_fill && emit_stroke && !path_is_closed(d) && !local_fill_specified) {
         emit_fill = false;
       }
-      const std::string stroke_outline = (emit_stroke && !keep_live_roundcap_stroke && !keep_live_dashed_stroke)
-        ? build_straight_stroke_outline(d, computed.stroke_width, to_string(computed.stroke_linecap), to_string(computed.stroke_linejoin), computed.stroke_miterlimit)
-        : "";
-      const std::string curve_fallback_outline =
-        (emit_stroke && !keep_live_roundcap_stroke && !keep_live_dashed_stroke && stroke_outline.empty() && has_curve_segments)
-          ? build_curve_fallback_outline(
-              d,
-              computed.stroke_width,
-              to_string(computed.stroke_linecap),
-              to_string(computed.stroke_linejoin),
-              computed.stroke_miterlimit)
+      const bool should_outline_stroke =
+        emit_stroke && !keep_live_roundcap_stroke && !keep_live_dashed_stroke;
+      const std::string final_stroke_outline =
+        should_outline_stroke
+          ? (has_curve_segments
+              ? build_curve_fallback_outline(
+                  d,
+                  computed.stroke_width,
+                  to_string(computed.stroke_linecap),
+                  to_string(computed.stroke_linejoin),
+                  computed.stroke_miterlimit)
+              : build_straight_stroke_outline(
+                  d,
+                  computed.stroke_width,
+                  to_string(computed.stroke_linecap),
+                  to_string(computed.stroke_linejoin),
+                  computed.stroke_miterlimit))
           : "";
-      const std::string final_stroke_outline = !stroke_outline.empty() ? stroke_outline : curve_fallback_outline;
 
       append_path_entry(out_paths, d, transform, style.fill, style.stroke, style, emit_fill, final_stroke_outline.empty() ? emit_stroke : false);
       if (!final_stroke_outline.empty()) {

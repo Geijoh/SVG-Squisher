@@ -2,8 +2,8 @@ build/
 out/
 dist/
 svgs/
-svgs-out-cpp/
-tmp-*/
+svgs-out/
+tmp/
 *.user
 *.suo
 *.VC.db

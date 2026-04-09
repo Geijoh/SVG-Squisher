@@ -1,6 +1,7 @@
 #include "svg_stroke.h"
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <cmath>
 #include <cstdlib>
@@ -376,6 +377,15 @@ struct OffsetCurveSegment {
   Point p3{};
 };
 
+struct ArcCenterParams {
+  Point center{};
+  double rx = 0.0;
+  double ry = 0.0;
+  double phi = 0.0;
+  double theta1 = 0.0;
+  double delta_theta = 0.0;
+};
+
 Point lerp(Point a, Point b, double t) {
   return {a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t};
 }
@@ -388,6 +398,127 @@ Point normalize_or_zero(Point p) {
 
 Point left_normal(Point tangent, double offset) {
   return {-tangent.y * offset, tangent.x * offset};
+}
+
+Point transform_arc_point(const ArcCenterParams& arc, double theta) {
+  const double cos_phi = std::cos(arc.phi);
+  const double sin_phi = std::sin(arc.phi);
+  const double cos_theta = std::cos(theta);
+  const double sin_theta = std::sin(theta);
+  return {
+    arc.center.x + arc.rx * cos_phi * cos_theta - arc.ry * sin_phi * sin_theta,
+    arc.center.y + arc.rx * sin_phi * cos_theta + arc.ry * cos_phi * sin_theta,
+  };
+}
+
+std::optional<ArcCenterParams> compute_arc_center(Point start,
+                                                  double rx,
+                                                  double ry,
+                                                  double x_axis_rotation_deg,
+                                                  int large_arc_flag,
+                                                  int sweep_flag,
+                                                  Point end) {
+  if (rx <= 0.0 || ry <= 0.0) return std::nullopt;
+  if (std::abs(start.x - end.x) < 1e-9 && std::abs(start.y - end.y) < 1e-9) return std::nullopt;
+
+  ArcCenterParams arc;
+  arc.phi = x_axis_rotation_deg * 3.14159265358979323846 / 180.0;
+  const double cos_phi = std::cos(arc.phi);
+  const double sin_phi = std::sin(arc.phi);
+  const double dx2 = (start.x - end.x) / 2.0;
+  const double dy2 = (start.y - end.y) / 2.0;
+  const double x1p = cos_phi * dx2 + sin_phi * dy2;
+  const double y1p = -sin_phi * dx2 + cos_phi * dy2;
+
+  arc.rx = std::abs(rx);
+  arc.ry = std::abs(ry);
+
+  const double lambda = (x1p * x1p) / (arc.rx * arc.rx) + (y1p * y1p) / (arc.ry * arc.ry);
+  if (lambda > 1.0) {
+    const double scale = std::sqrt(lambda);
+    arc.rx *= scale;
+    arc.ry *= scale;
+  }
+
+  const double rx2 = arc.rx * arc.rx;
+  const double ry2 = arc.ry * arc.ry;
+  const double x1p2 = x1p * x1p;
+  const double y1p2 = y1p * y1p;
+  const double denominator = rx2 * y1p2 + ry2 * x1p2;
+  if (denominator <= 1e-12) return std::nullopt;
+
+  const double numerator = std::max(0.0, rx2 * ry2 - rx2 * y1p2 - ry2 * x1p2);
+  double factor = std::sqrt(numerator / denominator);
+  if (large_arc_flag == sweep_flag) factor = -factor;
+
+  const double cxp = factor * ((arc.rx * y1p) / arc.ry);
+  const double cyp = factor * (-(arc.ry * x1p) / arc.rx);
+  arc.center = {
+    cos_phi * cxp - sin_phi * cyp + (start.x + end.x) / 2.0,
+    sin_phi * cxp + cos_phi * cyp + (start.y + end.y) / 2.0,
+  };
+
+  auto angle_between = [](double ux, double uy, double vx, double vy) {
+    return std::atan2(ux * vy - uy * vx, ux * vx + uy * vy);
+  };
+
+  const double ux = (x1p - cxp) / arc.rx;
+  const double uy = (y1p - cyp) / arc.ry;
+  const double vx = (-x1p - cxp) / arc.rx;
+  const double vy = (-y1p - cyp) / arc.ry;
+  arc.theta1 = std::atan2(uy, ux);
+  arc.delta_theta = angle_between(ux, uy, vx, vy);
+
+  if (!sweep_flag && arc.delta_theta > 0) arc.delta_theta -= 2.0 * 3.14159265358979323846;
+  if (sweep_flag && arc.delta_theta < 0) arc.delta_theta += 2.0 * 3.14159265358979323846;
+
+  return arc;
+}
+
+std::vector<CurveSegment> arc_to_curve_segments(Point start,
+                                                double rx,
+                                                double ry,
+                                                double x_axis_rotation_deg,
+                                                int large_arc_flag,
+                                                int sweep_flag,
+                                                Point end) {
+  if (const auto arc = compute_arc_center(start, rx, ry, x_axis_rotation_deg, large_arc_flag, sweep_flag, end)) {
+    const int pieces = std::max(1, static_cast<int>(std::ceil(std::abs(arc->delta_theta) / (3.14159265358979323846 / 2.0))));
+    const double step = arc->delta_theta / static_cast<double>(pieces);
+    const double cos_phi = std::cos(arc->phi);
+    const double sin_phi = std::sin(arc->phi);
+    std::vector<CurveSegment> segments;
+    segments.reserve(static_cast<std::size_t>(pieces));
+
+    for (int i = 0; i < pieces; ++i) {
+      const double theta0 = arc->theta1 + step * static_cast<double>(i);
+      const double theta1 = theta0 + step;
+      const double alpha = (4.0 / 3.0) * std::tan((theta1 - theta0) / 4.0);
+      const double cos0 = std::cos(theta0);
+      const double sin0 = std::sin(theta0);
+      const double cos1 = std::cos(theta1);
+      const double sin1 = std::sin(theta1);
+
+      const Point p0 = (i == 0) ? start : transform_arc_point(*arc, theta0);
+      const Point p3 = (i == pieces - 1) ? end : transform_arc_point(*arc, theta1);
+      const std::array<double, 2> c1_unit{cos0 - alpha * sin0, sin0 + alpha * cos0};
+      const std::array<double, 2> c2_unit{cos1 + alpha * sin1, sin1 - alpha * cos1};
+
+      const Point c1{
+        arc->center.x + arc->rx * cos_phi * c1_unit[0] - arc->ry * sin_phi * c1_unit[1],
+        arc->center.y + arc->rx * sin_phi * c1_unit[0] + arc->ry * cos_phi * c1_unit[1],
+      };
+      const Point c2{
+        arc->center.x + arc->rx * cos_phi * c2_unit[0] - arc->ry * sin_phi * c2_unit[1],
+        arc->center.y + arc->rx * sin_phi * c2_unit[0] + arc->ry * cos_phi * c2_unit[1],
+      };
+
+      segments.push_back({CurveKind::Cubic, p0, c1, c2, p3});
+    }
+    return segments;
+  }
+
+  return {{CurveKind::Line, start, end, {}, {}}};
 }
 
 double point_line_distance(Point p, Point a, Point b) {
@@ -709,7 +840,21 @@ std::optional<std::vector<CurveSubpath>> parse_curve_subpaths(const std::string&
         has_last_quad = false;
         prev_cmd = 'S';
       } else if (upper == 'A') {
-        return std::nullopt;
+        double rx = 0.0, ry = 0.0, rot = 0.0, large = 0.0, sweep = 0.0, x = 0.0, y = 0.0;
+        if (!parse_number_token(d, pos, rx) || !parse_number_token(d, pos, ry) ||
+            !parse_number_token(d, pos, rot) || !parse_number_token(d, pos, large) ||
+            !parse_number_token(d, pos, sweep) || !parse_number_token(d, pos, x) ||
+            !parse_number_token(d, pos, y)) return std::nullopt;
+        if (relative) { x += current.x; y += current.y; }
+        const Point next{x, y};
+        for (const CurveSegment& segment : arc_to_curve_segments(
+               current, rx, ry, rot, static_cast<int>(large), static_cast<int>(sweep), next)) {
+          active.segments.push_back(segment);
+        }
+        current = next;
+        has_last_cubic = false;
+        has_last_quad = false;
+        prev_cmd = 'A';
       } else {
         return std::nullopt;
       }
@@ -894,6 +1039,83 @@ std::string build_open_curve_outline(const CurveSubpath& subpath,
   return d;
 }
 
+std::string build_closed_curve_outline(const CurveSubpath& subpath,
+                                       double half_width,
+                                       const std::string& linejoin,
+                                       double miter_limit) {
+  if (subpath.segments.empty()) return "";
+
+  std::vector<OffsetCurveSegment> left_segments;
+  std::vector<OffsetCurveSegment> right_segments;
+  for (const CurveSegment& segment : subpath.segments) {
+    append_offset_curve_segments(segment, half_width, 1, 0, left_segments);
+    append_offset_curve_segments(segment, half_width, -1, 0, right_segments);
+  }
+  if (left_segments.empty() || right_segments.empty()) return "";
+
+  std::string d = "M" + fmt(offset_segment_start(left_segments.front()).x) + "," +
+                  fmt(offset_segment_start(left_segments.front()).y);
+  append_offset_segment_forward(d, left_segments.front());
+  for (std::size_t i = 1; i < left_segments.size(); ++i) {
+    append_join(
+      d,
+      offset_segment_end(left_segments[i - 1]),
+      offset_segment_start(left_segments[i]),
+      subpath.segments[i].p0,
+      curve_end_tangent(subpath.segments[i - 1]),
+      curve_start_tangent(subpath.segments[i]),
+      1,
+      linejoin,
+      half_width,
+      miter_limit);
+    append_offset_segment_forward(d, left_segments[i]);
+  }
+  append_join(
+    d,
+    offset_segment_end(left_segments.back()),
+    offset_segment_start(left_segments.front()),
+    subpath.segments.front().p0,
+    curve_end_tangent(subpath.segments.back()),
+    curve_start_tangent(subpath.segments.front()),
+    1,
+    linejoin,
+    half_width,
+    miter_limit);
+  d += "Z";
+
+  d += " M" + fmt(offset_segment_end(right_segments.back()).x) + "," +
+       fmt(offset_segment_end(right_segments.back()).y);
+  for (std::size_t i = right_segments.size(); i-- > 0;) {
+    append_offset_segment_reverse(d, right_segments[i]);
+    if (i > 0) {
+      append_join(
+        d,
+        offset_segment_start(right_segments[i]),
+        offset_segment_end(right_segments[i - 1]),
+        subpath.segments[i].p0,
+        curve_start_tangent(subpath.segments[i]) * -1.0,
+        curve_end_tangent(subpath.segments[i - 1]) * -1.0,
+        -1,
+        linejoin,
+        half_width,
+        miter_limit);
+    }
+  }
+  append_join(
+    d,
+    offset_segment_start(right_segments.front()),
+    offset_segment_end(right_segments.back()),
+    subpath.segments.front().p0,
+    curve_start_tangent(subpath.segments.front()) * -1.0,
+    curve_end_tangent(subpath.segments.back()) * -1.0,
+    -1,
+    linejoin,
+    half_width,
+    miter_limit);
+  d += "Z";
+  return d;
+}
+
 }  // namespace
 
 std::string build_straight_stroke_outline(const std::string& d,
@@ -935,11 +1157,13 @@ std::string build_curve_fallback_outline(const std::string& d,
   if (const auto curve_subpaths = parse_curve_subpaths(d)) {
     std::string combined;
     for (const CurveSubpath& subpath : *curve_subpaths) {
-      if (subpath.segments.empty() || subpath.closed) {
+      if (subpath.segments.empty()) {
         combined.clear();
         break;
       }
-      const std::string part = build_open_curve_outline(subpath, half_width, linecap, linejoin, miter_limit);
+      const std::string part = subpath.closed
+        ? build_closed_curve_outline(subpath, half_width, linejoin, miter_limit)
+        : build_open_curve_outline(subpath, half_width, linecap, linejoin, miter_limit);
       if (part.empty()) {
         combined.clear();
         break;
