@@ -1,15 +1,9 @@
 build/
 out/
 dist/
-parity-input/
-parity-node-out/
-parity-cpp-out/
 svgs/
 svgs-out-cpp/
 tmp-*/
-tests/regression-input/
-tests/regression-node-out/
-tests/regression-cpp-out/
 *.user
 *.suo
 *.VC.db
