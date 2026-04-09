@@ -191,7 +191,12 @@ void collect_paths(const pugi::xml_node& node,
         : "";
       const std::string curve_fallback_outline =
         (emit_stroke && !keep_live_roundcap_stroke && !keep_live_dashed_stroke && stroke_outline.empty() && has_curve_segments)
-          ? build_curve_fallback_outline(d, computed.stroke_width)
+          ? build_curve_fallback_outline(
+              d,
+              computed.stroke_width,
+              to_string(computed.stroke_linecap),
+              to_string(computed.stroke_linejoin),
+              computed.stroke_miterlimit)
           : "";
       const std::string final_stroke_outline = !stroke_outline.empty() ? stroke_outline : curve_fallback_outline;
 

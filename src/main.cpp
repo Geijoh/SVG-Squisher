@@ -16,15 +16,15 @@ void print_usage() {
   std::cout
       << "SVG Squisher C++\n\n"
       << "Usage:\n"
-      << "  svg_squisher_cpp <input.svg> <output.svg> [--fill <color>] [--font <path>]\n"
-      << "  svg_squisher_cpp <input-dir> <output-dir> [--fill <color>] [--font <path>]\n";
+      << "  svg_squisher <input.svg> <output.svg> [--fill <color>] [--font <path>]\n"
+      << "  svg_squisher <input-dir> <output-dir> [--fill <color>] [--font <path>]\n";
 }
 
 }  // namespace
 
 int main(int argc, char** argv) {
   try {
-    if (argc < 3) {
+    if (argc < 2) {
       print_usage();
       return 1;
     }

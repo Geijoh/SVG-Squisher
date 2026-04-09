@@ -50,6 +50,7 @@ add_executable(svg_squisher_cpp
 )
 
 target_include_directories(svg_squisher_cpp PRIVATE src)
+set_target_properties(svg_squisher_cpp PROPERTIES OUTPUT_NAME svg_squisher)
 target_include_directories(svg_squisher_cpp PRIVATE
   ${freetype_SOURCE_DIR}/include
 )

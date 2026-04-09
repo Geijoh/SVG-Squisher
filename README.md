@@ -36,25 +36,25 @@ cmake --build build --config Release
 Convert a single file:
 
 ```powershell
-.\build\Release\svg_squisher_cpp.exe input.svg output.svg
+.\build\Release\svg_squisher.exe input.svg output.svg
 ```
 
 Convert a directory:
 
 ```powershell
-.\build\Release\svg_squisher_cpp.exe input-folder output-folder
+.\build\Release\svg_squisher.exe input-folder output-folder
 ```
 
 Flatten all output to a single fill color:
 
 ```powershell
-.\build\Release\svg_squisher_cpp.exe input-folder output-folder --fill white
+.\build\Release\svg_squisher.exe input-folder output-folder --fill white
 ```
 
 Provide an explicit font for text conversion:
 
 ```powershell
-.\build\Release\svg_squisher_cpp.exe input.svg output.svg --font C:\Windows\Fonts\arial.ttf
+.\build\Release\svg_squisher.exe input.svg output.svg --font C:\Windows\Fonts\arial.ttf
 ```
 
 ## Repository Layout

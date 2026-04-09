@@ -32,7 +32,7 @@ jobs:
         shell: bash
         run: |
           if [ "$RUNNER_OS" = "Windows" ]; then
-            ./build/${{ matrix.config }}/svg_squisher_cpp.exe --help
+            ./build/${{ matrix.config }}/svg_squisher.exe --help
           else
-            ./build/svg_squisher_cpp --help
+            ./build/svg_squisher --help
           fi
