@@ -1,4 +1,4 @@
-#include "svg_path.h"
+﻿#include "svg_path.h"
 
 #include <cctype>
 #include <cmath>
@@ -11,7 +11,7 @@
 #include "svg_transform.h"
 #include "svg_util.h"
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 namespace {
 
 bool is_command_char(char ch) {
@@ -314,4 +314,5 @@ void append_path_entry(std::vector<PathEntry>& out_paths,
   out_paths.push_back(std::move(entry));
 }
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

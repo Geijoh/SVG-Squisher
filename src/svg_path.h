@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <optional>
 #include <string>
@@ -8,7 +8,7 @@
 #include "svg_style.h"
 #include "svg_transform.h"
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 
 std::optional<std::string> bake_path_transform(const std::string& d, const Matrix& matrix);
 
@@ -25,4 +25,5 @@ void append_path_entry(std::vector<PathEntry>& out_paths,
                        bool emit_fill,
                        bool emit_stroke);
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

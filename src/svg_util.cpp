@@ -1,4 +1,4 @@
-#include "svg_util.h"
+﻿#include "svg_util.h"
 
 #include <algorithm>
 #include <cctype>
@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 
 std::string trim(std::string value) {
   auto not_space = [](unsigned char ch) { return !std::isspace(ch); };
@@ -69,4 +69,5 @@ bool paint_is_visible(const std::string& paint, double opacity) {
   return lower_copy(trim(paint)) != "none" && opacity > 1e-6;
 }
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

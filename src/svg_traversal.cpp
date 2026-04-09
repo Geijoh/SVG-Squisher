@@ -1,4 +1,4 @@
-#include "svg_traversal.h"
+﻿#include "svg_traversal.h"
 
 #include <optional>
 #include <string>
@@ -13,7 +13,7 @@
 #include "svg_transform.h"
 #include "svg_util.h"
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 namespace {
 
 void collect_text_node(const pugi::xml_node& node,
@@ -229,4 +229,5 @@ void collect_paths_from_svg(const pugi::xml_node& svg_node,
   }
 }
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

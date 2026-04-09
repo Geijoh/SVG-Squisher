@@ -1,4 +1,4 @@
-#include "svg_postprocess.h"
+﻿#include "svg_postprocess.h"
 
 #include <algorithm>
 #include <optional>
@@ -11,7 +11,7 @@
 #include "svg_paint.h"
 #include "svg_util.h"
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 namespace {
 
 std::optional<std::pair<double, double>> parse_viewbox_size(const pugi::xml_node& svg_node) {
@@ -98,4 +98,5 @@ std::vector<PathEntry> prepare_output_paths(const pugi::xml_node& svg_node,
   return final_paths;
 }
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

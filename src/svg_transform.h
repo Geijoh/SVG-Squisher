@@ -1,8 +1,8 @@
-#pragma once
+﻿#pragma once
 
 #include <string>
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 
 struct Matrix {
   double a = 1.0;
@@ -25,4 +25,5 @@ bool matrix_is_scale_translate_only(const Matrix& m, double eps = 1e-9);
 Matrix parse_transform(const std::string& transform_text);
 std::string combine_transform(const std::string& parent, const std::string& local);
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

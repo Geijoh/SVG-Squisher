@@ -1,9 +1,9 @@
-#pragma once
+﻿#pragma once
 
 #include <string>
 #include <vector>
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 
 std::string trim(std::string value);
 std::string lower_copy(std::string value);
@@ -14,4 +14,5 @@ double parse_double_string(const std::string& text, double fallback = 0.0);
 double combined_opacity(const std::string& a, const std::string& b);
 bool paint_is_visible(const std::string& paint, double opacity);
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

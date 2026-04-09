@@ -1,11 +1,11 @@
-#include "svg_entry.h"
+﻿#include "svg_entry.h"
 
 #include "svg_computed_style.h"
 #include "svg_geometry.h"
 #include "svg_paint.h"
 #include "svg_util.h"
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 
 PathEntryAnalysis analyze_path_entry(const PathEntry& entry) {
   PathEntryAnalysis analysis;
@@ -39,4 +39,5 @@ PathEntryAnalysis analyze_path_entry(const PathEntry& entry) {
   return analysis;
 }
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

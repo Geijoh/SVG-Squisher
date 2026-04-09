@@ -1,4 +1,4 @@
-#include "svg_shape.h"
+﻿#include "svg_shape.h"
 
 #include <algorithm>
 #include <sstream>
@@ -7,7 +7,7 @@
 
 #include "svg_util.h"
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 
 double attr_double(const pugi::xml_node& node, const char* name, double fallback) {
   if (!node.attribute(name)) return fallback;
@@ -152,4 +152,5 @@ std::string node_to_path(const pugi::xml_node& node) {
   return "";
 }
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

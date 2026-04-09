@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(svg_squisher_cpp VERSION 0.1.0 LANGUAGES CXX)
+project(svg_squisher VERSION 0.1.0 LANGUAGES CXX)
 
 include(FetchContent)
 
@@ -29,7 +29,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(pugixml)
 FetchContent_MakeAvailable(freetype)
 
-add_executable(svg_squisher_cpp
+add_executable(svg_squisher
   src/main.cpp
   src/svg_computed_style.cpp
   src/svg_dom.cpp
@@ -49,15 +49,14 @@ add_executable(svg_squisher_cpp
   src/svg_squisher.cpp
 )
 
-target_include_directories(svg_squisher_cpp PRIVATE src)
-set_target_properties(svg_squisher_cpp PROPERTIES OUTPUT_NAME svg_squisher)
-target_include_directories(svg_squisher_cpp PRIVATE
+target_include_directories(svg_squisher PRIVATE src)
+target_include_directories(svg_squisher PRIVATE
   ${freetype_SOURCE_DIR}/include
 )
-target_link_libraries(svg_squisher_cpp PRIVATE pugixml freetype)
+target_link_libraries(svg_squisher PRIVATE pugixml freetype)
 
 if(MSVC)
-  target_compile_options(svg_squisher_cpp PRIVATE /W4 /permissive-)
+  target_compile_options(svg_squisher PRIVATE /W4 /permissive-)
 else()
-  target_compile_options(svg_squisher_cpp PRIVATE -Wall -Wextra -Wpedantic)
+  target_compile_options(svg_squisher PRIVATE -Wall -Wextra -Wpedantic)
 endif()

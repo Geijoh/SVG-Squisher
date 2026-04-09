@@ -1,4 +1,4 @@
-#include "svg_output.h"
+﻿#include "svg_output.h"
 
 #include <fstream>
 #include <optional>
@@ -14,7 +14,7 @@
 
 namespace fs = std::filesystem;
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 namespace {
 
 void collect_referenced_def_ids(const std::vector<PathEntry>& paths,
@@ -167,4 +167,5 @@ void write_file(const fs::path& path, const std::string& text) {
   out << text;
 }
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

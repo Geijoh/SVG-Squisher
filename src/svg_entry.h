@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <optional>
 #include <string>
@@ -6,7 +6,7 @@
 #include "svg_computed_style.h"
 #include "svg_squisher.h"
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 
 struct PathPaintInfo {
   std::string value;
@@ -30,4 +30,5 @@ struct PathEntryAnalysis {
 
 PathEntryAnalysis analyze_path_entry(const PathEntry& entry);
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

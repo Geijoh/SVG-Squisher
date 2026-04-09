@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <optional>
 #include <string>
@@ -8,7 +8,7 @@
 
 #include "svg_style.h"
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 
 struct TextCursor {
   double x = 0.0;
@@ -58,4 +58,5 @@ double measure_text_advance(const std::string& text,
                             const std::string& font_path,
                             double letter_spacing);
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

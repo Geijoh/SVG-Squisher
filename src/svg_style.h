@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <string>
 #include <vector>
@@ -7,7 +7,7 @@
 
 #include "svg_squisher.h"
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 
 struct StyleState {
   std::string fill = "black";
@@ -39,4 +39,5 @@ StyleState resolve_style(const pugi::xml_node& node,
                          const std::vector<CssRule>& rules,
                          const StyleState& inherited);
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

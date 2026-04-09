@@ -1,11 +1,11 @@
-#pragma once
+﻿#pragma once
 
 #include <filesystem>
 #include <optional>
 #include <string>
 #include <vector>
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 
 struct Options {
   std::optional<std::string> fill_override;
@@ -44,4 +44,5 @@ public:
                         const Options& options = {}) const;
 };
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

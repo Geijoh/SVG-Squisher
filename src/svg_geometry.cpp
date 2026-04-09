@@ -1,4 +1,4 @@
-#include "svg_geometry.h"
+﻿#include "svg_geometry.h"
 
 #include <algorithm>
 #include <cctype>
@@ -11,7 +11,7 @@
 
 #include "svg_util.h"
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 namespace {
 
 bool is_command_char(char ch) {
@@ -650,4 +650,5 @@ bool bbox_contains(const std::optional<BBox>& outer,
          outer->max_y >= inner->max_y - tolerance;
 }
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

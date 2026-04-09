@@ -1,11 +1,11 @@
-#include "svg_transform.h"
+﻿#include "svg_transform.h"
 
 #include <cmath>
 #include <string>
 
 #include "svg_util.h"
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 
 Matrix multiply(const Matrix& lhs, const Matrix& rhs) {
   Matrix out;
@@ -93,4 +93,5 @@ std::string combine_transform(const std::string& parent, const std::string& loca
   return a + " " + b;
 }
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

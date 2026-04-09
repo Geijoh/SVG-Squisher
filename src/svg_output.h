@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <filesystem>
 #include <optional>
@@ -9,7 +9,7 @@
 
 #include "svg_squisher.h"
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 
 std::string xml_escape(const std::string& value);
 
@@ -26,4 +26,5 @@ std::string read_file(const std::filesystem::path& path);
 
 void write_file(const std::filesystem::path& path, const std::string& text);
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

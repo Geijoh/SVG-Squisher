@@ -1,4 +1,4 @@
-#include "svg_text.h"
+﻿#include "svg_text.h"
 
 #include <algorithm>
 #include <cctype>
@@ -20,7 +20,7 @@
 
 namespace fs = std::filesystem;
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 namespace {
 
 struct FontLibrary {
@@ -416,4 +416,5 @@ std::vector<double> coord_values(const pugi::xml_node& node, const char* attr_na
   return parse_number_list(node.attribute(attr_name).as_string());
 }
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

@@ -1,10 +1,10 @@
-#pragma once
+﻿#pragma once
 
 #include <string>
 
 #include "svg_style.h"
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 
 enum class StrokeLineCap {
   Butt,
@@ -48,4 +48,5 @@ std::string to_string(StrokeLineCap linecap);
 
 std::string to_string(StrokeLineJoin linejoin);
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

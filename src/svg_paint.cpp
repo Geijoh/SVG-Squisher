@@ -1,8 +1,8 @@
-#include "svg_paint.h"
+﻿#include "svg_paint.h"
 
 #include "svg_util.h"
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 
 ParsedPaint parse_paint(const std::string& paint, double opacity) {
   ParsedPaint parsed;
@@ -55,4 +55,5 @@ std::optional<double> paint_brightness(const std::string& paint) {
   return 0.299 * r + 0.587 * g + 0.114 * b;
 }
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

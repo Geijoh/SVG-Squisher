@@ -1,4 +1,4 @@
-#include "svg_squisher.h"
+﻿#include "svg_squisher.h"
 
 #include <optional>
 #include <stdexcept>
@@ -15,7 +15,7 @@
 
 namespace fs = std::filesystem;
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 
 std::string SvgSquisher::squish_string(const std::string& svg_text, const Options& options) const {
   pugi::xml_document doc;
@@ -58,4 +58,5 @@ void SvgSquisher::squish_directory(const fs::path& input_dir,
   }
 }
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

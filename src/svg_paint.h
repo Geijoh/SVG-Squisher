@@ -1,9 +1,9 @@
-#pragma once
+﻿#pragma once
 
 #include <optional>
 #include <string>
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 
 enum class PaintKind {
   None,
@@ -25,4 +25,5 @@ bool paint_equals(const std::string& lhs, const std::string& rhs);
 
 std::optional<double> paint_brightness(const std::string& paint);
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

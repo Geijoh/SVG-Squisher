@@ -1,4 +1,4 @@
-#include "svg_style.h"
+﻿#include "svg_style.h"
 
 #include <algorithm>
 #include <cctype>
@@ -10,7 +10,7 @@
 
 #include "svg_util.h"
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 namespace {
 
 std::unordered_map<std::string, std::string> parse_style_map(const std::string& style_text) {
@@ -146,4 +146,5 @@ StyleState resolve_style(const pugi::xml_node& node,
   return style;
 }
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

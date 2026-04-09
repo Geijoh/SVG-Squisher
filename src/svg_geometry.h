@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <optional>
 #include <string>
@@ -6,7 +6,7 @@
 
 #include "svg_transform.h"
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 
 struct StrokeSubpath {
   std::vector<Point> points;
@@ -38,4 +38,5 @@ bool bbox_contains(const std::optional<BBox>& outer,
                    const std::optional<BBox>& inner,
                    double tolerance = 0.75);
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

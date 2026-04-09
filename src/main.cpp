@@ -1,4 +1,4 @@
-#include "svg_squisher.h"
+﻿#include "svg_squisher.h"
 
 #include <filesystem>
 #include <iostream>
@@ -7,8 +7,8 @@
 #include <vector>
 
 namespace fs = std::filesystem;
-using svg_squisher_cpp::Options;
-using svg_squisher_cpp::SvgSquisher;
+using svg_squisher::Options;
+using svg_squisher::SvgSquisher;
 
 namespace {
 
@@ -75,3 +75,4 @@ int main(int argc, char** argv) {
     return 1;
   }
 }
+

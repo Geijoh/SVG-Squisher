@@ -1,4 +1,4 @@
-#include "svg_stroke.h"
+﻿#include "svg_stroke.h"
 
 #include <algorithm>
 #include <array>
@@ -12,7 +12,7 @@
 #include "svg_geometry.h"
 #include "svg_util.h"
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 namespace {
 
 bool is_command_char(char ch) {
@@ -1189,4 +1189,5 @@ std::string build_curve_fallback_outline(const std::string& d,
   return combined;
 }
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

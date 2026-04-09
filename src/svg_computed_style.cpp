@@ -1,4 +1,4 @@
-#include "svg_computed_style.h"
+﻿#include "svg_computed_style.h"
 
 #include <string>
 
@@ -6,7 +6,7 @@
 #include "svg_text.h"
 #include "svg_util.h"
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 namespace {
 
 StrokeLineCap parse_linecap(const std::string& value) {
@@ -74,4 +74,5 @@ std::string to_string(StrokeLineJoin linejoin) {
   }
 }
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

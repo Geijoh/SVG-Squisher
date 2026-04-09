@@ -1,10 +1,10 @@
-#include "svg_dom.h"
+﻿#include "svg_dom.h"
 
 #include <algorithm>
 #include <string>
 #include <vector>
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 
 bool should_skip_tag(const std::string& name) {
   static const std::vector<std::string> skipped = {
@@ -26,4 +26,5 @@ std::optional<pugi::xml_node> find_by_id(const pugi::xml_node& node, const std::
   return std::nullopt;
 }
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+

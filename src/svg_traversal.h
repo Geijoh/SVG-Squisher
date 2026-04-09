@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <optional>
 #include <vector>
@@ -8,7 +8,7 @@
 #include "svg_squisher.h"
 #include "svg_style.h"
 
-namespace svg_squisher_cpp {
+namespace svg_squisher {
 
 void collect_paths_from_svg(const pugi::xml_node& svg_node,
                             const std::vector<CssRule>& rules,
@@ -16,4 +16,5 @@ void collect_paths_from_svg(const pugi::xml_node& svg_node,
                             const std::optional<std::string>& font_path,
                             std::vector<PathEntry>& out_paths);
 
-}  // namespace svg_squisher_cpp
+}  // namespace svg_squisher
+
