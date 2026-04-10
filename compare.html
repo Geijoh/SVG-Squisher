@@ -15,6 +15,7 @@
       --muted: #b8b8b8;
       --accent: #7fb3ff;
       --preview-size: 180px;
+      --header-height: 0px;
     }
 
     * { box-sizing: border-box; }
@@ -157,10 +158,12 @@
 
     .header-row {
       position: sticky;
-      top: 108px;
+      top: var(--header-height);
       z-index: 5;
       background: var(--bg);
-      padding-bottom: 4px;
+      min-height: auto;
+      padding: 0 0 6px;
+      border-bottom: 1px solid rgba(74, 74, 74, 0.7);
     }
 
     .col-head {
@@ -204,12 +207,18 @@
   </main>
 
   <script>
+    const pageHeader = document.querySelector("header");
     const inputField = document.getElementById("inputDir");
     const outputField = document.getElementById("outputDir");
     const previewSizeField = document.getElementById("previewSize");
     const reloadBtn = document.getElementById("reloadBtn");
     const meta = document.getElementById("meta");
     const grid = document.getElementById("grid");
+
+    function updateStickyOffsets() {
+      const headerHeight = pageHeader?.getBoundingClientRect().height || 0;
+      document.documentElement.style.setProperty("--header-height", `${Math.ceil(headerHeight)}px`);
+    }
 
     function normalizeSize(value) {
       const parsed = Number.parseInt(String(value || "").trim(), 10);
@@ -331,6 +340,7 @@
       const inputDir = normalizeDir(inputField.value) || "svgs";
       const outputDir = normalizeDir(outputField.value) || "svgs-out";
       updateQueryParams();
+      updateStickyOffsets();
       meta.textContent = "Loading…";
 
       try {
@@ -357,6 +367,8 @@
     });
 
     readQueryParams();
+    updateStickyOffsets();
+    window.addEventListener("resize", updateStickyOffsets);
     load();
   </script>
 </body>
