@@ -62,7 +62,7 @@ Provide an explicit font for text conversion:
 An input-vs-output comparison page is included at `compare.html`.
 
 ![SVG Squisher Compare interface listing SVG files in a left column with matching input and output preview cards side by side for each file.](assets/img_readme_compare.png) 
-*Portions of the materials used are trademarks and/or copyrighted works of Epic Games, Inc. All rights reserved by Epic. This material is not official and is not endorsed by Epic.*
+*Screenshot includes Unreal Engine icons and interface elements. Portions of the materials used are trademarks and/or copyrighted works of Epic Games, Inc. All rights reserved by Epic. This material is not official and is not endorsed by Epic.*
 
 By default it compares:
 
