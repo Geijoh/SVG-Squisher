@@ -173,10 +173,6 @@ void collect_paths(const pugi::xml_node& node,
     if (!d.empty()) {
       const bool local_fill_specified = node_has_local_property(node, rules, "fill");
       const bool has_curve_segments = path_has_curve_segments(d);
-      const bool keep_live_roundcap_stroke =
-        computed.has_stroke &&
-        !path_is_closed(d) &&
-        computed.stroke_linecap == StrokeLineCap::Round;
       const bool keep_live_dashed_stroke = computed.has_stroke && computed.has_dash_pattern;
       bool emit_fill = computed.has_fill;
       bool emit_stroke = computed.has_stroke;
@@ -187,7 +183,7 @@ void collect_paths(const pugi::xml_node& node,
         emit_fill = false;
       }
       const bool should_outline_stroke =
-        emit_stroke && !keep_live_roundcap_stroke && !keep_live_dashed_stroke;
+        emit_stroke && !keep_live_dashed_stroke;
       const std::string final_stroke_outline =
         should_outline_stroke
           ? (has_curve_segments
